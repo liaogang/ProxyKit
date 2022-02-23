@@ -7,7 +7,7 @@
 //
 
 #import "GCDAsyncProxySocket.h"
-
+#import <netinet/in.h>
 #import <CocoaLumberjack/CocoaLumberjack.h>
 
 //@import CocoaLumberjack;
