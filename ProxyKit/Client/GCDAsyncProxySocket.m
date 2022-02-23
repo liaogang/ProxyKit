@@ -280,9 +280,7 @@
 	// Address      = P:D (P=LengthOfDomain D=DomainWithoutNullTermination)
 	// Port         = 0
     
-    NSUInteger hostLength = [self.destinationHost length];
-    NSData *hostData = [self.destinationHost dataUsingEncoding:NSUTF8StringEncoding];
-	NSUInteger byteBufferLength = (uint)(4 + 1 + hostLength + 2);
+	NSUInteger byteBufferLength = 10;
 	uint8_t *byteBuffer = malloc(byteBufferLength * sizeof(uint8_t));
     NSUInteger offset = 0;
 	
@@ -307,7 +305,7 @@
      o  DOMAINNAME: X'03'
      o  IP V6 address: X'04'
     */
-	uint8_t addressType = 0x03;
+	uint8_t addressType = 0x01;
     byteBuffer[offset] = addressType;
     offset++;
     /* ADDR
@@ -317,10 +315,17 @@
      follow, there is no terminating NUL octet.
      o  X'04' - the address is a version-6 IP address, with a length of 16 octets.
      */
-    byteBuffer[offset] = hostLength;
-    offset++;
-	memcpy(byteBuffer+offset, [hostData bytes], hostLength);
-	offset+=hostLength;
+    NSError *error;
+    NSArray *addresses = [GCDAsyncSocket lookupHost:self.destinationHost port:self.destinationPort error:&error];
+    NSData *address = addresses.firstObject;
+    
+    struct sockaddr *saddr = (struct sockaddr *)address.bytes;
+    struct sockaddr_in *sin = (struct sockaddr_in *)saddr;
+    struct in_addr inaddr = sin->sin_addr;
+
+	memcpy(byteBuffer+offset, (void*)&inaddr, sizeof(inaddr));
+	offset+=sizeof(inaddr);
+    
 	uint16_t port = htons(self.destinationPort);
     NSUInteger portLength = 2;
 	memcpy(byteBuffer+offset, &port, portLength);
