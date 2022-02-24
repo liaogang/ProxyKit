@@ -30,18 +30,13 @@
 #define TIMEOUT_TOTAL        80.00
 
 #import "SOCKSProxySocket.h"
-#import <CocoaLumberjack/CocoaLumberjack.h>
-//@import CocoaLumberjack;
-#if DEBUG
-static const int ddLogLevel = DDLogLevelVerbose;
-#else
-static const int ddLogLevel = DDLogLevelOff;
-#endif
+
+
 #include <arpa/inet.h>
 
 @interface SOCKSProxySocket()
-@property (nonatomic, strong) GCDAsyncSocket *proxySocket;
-@property (nonatomic, strong) GCDAsyncSocket *outgoingSocket;
+@property (nonatomic, strong) GCDAsyncNiceSocket *proxySocket;
+@property (nonatomic, strong) GCDAsyncNiceSocket *outgoingSocket;
 @property (nonatomic) dispatch_queue_t delegateQueue;
 @property (nonatomic) NSUInteger totalBytesWritten;
 @property (nonatomic) NSUInteger totalBytesRead;
@@ -54,7 +49,7 @@ static const int ddLogLevel = DDLogLevelOff;
     [self disconnect];
 }
 
-- (id) initWithSocket:(GCDAsyncSocket *)socket delegate:(id<SOCKSProxySocketDelegate>)delegate {
+- (id) initWithSocket:(GCDAsyncNiceSocket *)socket delegate:(id<SOCKSProxySocketDelegate>)delegate {
     if (self = [super init]) {
         _delegate = delegate;
         self.delegateQueue = dispatch_queue_create("SOCKSProxySocket socket delegate queue", 0);
@@ -62,7 +57,7 @@ static const int ddLogLevel = DDLogLevelOff;
         self.proxySocket = socket;
         self.proxySocket.delegate = self;
         self.proxySocket.delegateQueue = self.delegateQueue;
-        self.outgoingSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.delegateQueue];
+        self.outgoingSocket = [[GCDAsyncNiceSocket alloc] initWithDelegate:self delegateQueue:self.delegateQueue];
         [self socksOpen];
     }
     return self;
@@ -75,7 +70,7 @@ static const int ddLogLevel = DDLogLevelOff;
     self.outgoingSocket = nil;
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag {
+- (void) socket:(GCDAsyncNiceSocket *)sock didReadData:(NSData *)data withTag:(long)tag {
     if (tag == SOCKS_OPEN) {
         /*
          The initial greeting from the client is
@@ -138,7 +133,7 @@ static const int ddLogLevel = DDLogLevelOff;
             uint8_t *bytes = (uint8_t*)data.bytes;
             uint8_t version = bytes[0];
             uint8_t usernameLength = bytes[1];
-            DDLogVerbose(@"AUTH version %d. Reading username...", version);
+            //DDLogVerbose(@"AUTH version %d. Reading username...", version);
             [sock readDataToLength:usernameLength+1 withTimeout:-1 tag:SOCKS_CONNECT_AUTH_USERNAME];
         }
     } else if (tag == SOCKS_CONNECT_AUTH_USERNAME) {
@@ -146,12 +141,12 @@ static const int ddLogLevel = DDLogLevelOff;
             NSData *usernameData = [data subdataWithRange:NSMakeRange(0, data.length - 1)];
             NSString *usernameString = [[NSString alloc] initWithData:usernameData encoding:NSUTF8StringEncoding];
             self.username = usernameString;
-            DDLogVerbose(@"AUTH username %@", usernameString);
+            //DDLogVerbose(@"AUTH username %@", usernameString);
             NSData *passwordLengthData = [data subdataWithRange:NSMakeRange(data.length - 1, 1)];
             if (passwordLengthData.length == 1) {
                 uint8_t *passwordLengthBytes = (uint8_t*)passwordLengthData.bytes;
                 uint8_t passwordLength = passwordLengthBytes[0];
-                DDLogVerbose(@"Reading password of length %d...", passwordLength);
+                //DDLogVerbose(@"Reading password of length %d...", passwordLength);
                 [sock readDataToLength:passwordLength withTimeout:-1 tag:SOCKS_CONNECT_AUTH_PASSWORD];
             }
         }
@@ -258,7 +253,7 @@ static const int ddLogLevel = DDLogLevelOff;
     [self.proxySocket readDataToLength:3 withTimeout:TIMEOUT_CONNECT tag:SOCKS_OPEN];
 }
 
-- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err {
+- (void) socketDidDisconnect:(GCDAsyncNiceSocket *)sock withError:(NSError *)err {
     if (self.delegate && [self.delegate respondsToSelector:@selector(proxySocketDidDisconnect:withError:)]) {
         dispatch_async(self.callbackQueue, ^{
             [self.delegate proxySocketDidDisconnect:self withError:err];
@@ -266,7 +261,7 @@ static const int ddLogLevel = DDLogLevelOff;
     }
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port {
+- (void) socket:(GCDAsyncNiceSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port {
     // We write out 5 bytes which we expect to be:
     // 0: ver  = 5
     // 1: rep  = 0
