@@ -7,8 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-//@import CocoaAsyncSocket;
-#import <CocoaAsyncSocket/GCDAsyncSocket.h>
+#import <GCDAsyncNiceSocket.h>
 
 @class SOCKSProxySocket;
 
@@ -22,7 +21,7 @@ checkAuthorizationForUser:(NSString*)username
             password:(NSString*)password;
 @end
 
-@interface SOCKSProxySocket : NSObject <GCDAsyncSocketDelegate>
+@interface SOCKSProxySocket : NSObject <GCDAsyncNiceSocketDelegate>
 
 @property (nonatomic, readonly) uint16_t destinationPort;
 @property (nonatomic, strong, readonly) NSString* destinationHost;
@@ -33,6 +32,6 @@ checkAuthorizationForUser:(NSString*)username
 
 - (void) disconnect;
 
-- (id) initWithSocket:(GCDAsyncSocket*)socket delegate:(id<SOCKSProxySocketDelegate>)delegate;
+- (id) initWithSocket:(GCDAsyncNiceSocket*)socket delegate:(id<SOCKSProxySocketDelegate>)delegate;
 
 @end

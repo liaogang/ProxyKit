@@ -10,7 +10,7 @@
 #import "SOCKSProxySocket.h"
 
 @interface SOCKSProxy()
-@property (nonatomic, strong) GCDAsyncSocket *listeningSocket;
+@property (nonatomic, strong) GCDAsyncNiceSocket *listeningSocket;
 @property (nonatomic) dispatch_queue_t listeningQueue;
 @property (nonatomic, strong) NSMutableSet *activeSockets;
 @property (nonatomic) NSUInteger totalBytesWritten;
@@ -44,7 +44,7 @@
 
 - (BOOL) startProxyOnPort:(uint16_t)port error:(NSError**)error {
     [self disconnect];
-    self.listeningSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.listeningQueue];
+    self.listeningSocket = [[GCDAsyncNiceSocket alloc] initWithDelegate:self delegateQueue:self.listeningQueue];
     self.activeSockets = [NSMutableSet set];
     _listeningPort = port;
     return [self.listeningSocket acceptOnPort:port error:error];
@@ -70,7 +70,7 @@
     return [existingPassword isEqualToString:password];
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket {
+- (void) socket:(GCDAsyncNiceSocket *)sock didAcceptNewSocket:(GCDAsyncNiceSocket *)newSocket {
     NSLog(@"Accepted new socket: %@", newSocket);
 #if TARGET_OS_IPHONE
     [newSocket performBlock:^{

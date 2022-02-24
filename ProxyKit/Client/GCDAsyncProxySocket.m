@@ -8,7 +8,7 @@
 
 #import "GCDAsyncProxySocket.h"
 #import <netinet/in.h>
-#import <CocoaLumberjack/CocoaLumberjack.h>
+// #import <CocoaLumberjack/CocoaLumberjack.h>
 
 //@import CocoaLumberjack;
 #if DEBUG
@@ -31,7 +31,7 @@
 #define TIMEOUT_TOTAL        80.00
 
 @interface GCDAsyncProxySocket()
-@property (nonatomic, strong, readonly) GCDAsyncSocket *proxySocket;
+@property (nonatomic, strong, readonly) GCDAsyncNiceSocket *proxySocket;
 @property (nonatomic, readonly) dispatch_queue_t proxyDelegateQueue;
 @property (nonatomic, strong, readonly) NSString *destinationHost;
 @property (nonatomic, readonly) uint16_t destinationPort;
@@ -39,7 +39,7 @@
 
 @implementation GCDAsyncProxySocket
 
-- (void) setProxyHost:(NSString *)host port:(uint16_t)port version:(GCDAsyncSocketSOCKSVersion)version {
+- (void) setProxyHost:(NSString *)host port:(uint16_t)port version:(GCDAsyncNiceSocketSOCKSVersion)version {
     _proxyHost = host;
     _proxyPort = port;
     _proxyVersion = version;
@@ -74,7 +74,7 @@
                 error:(NSError **)errPtr
 {
     if (!self.proxySocket) {
-        _proxySocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.proxyDelegateQueue socketQueue:NULL];
+        _proxySocket = [[GCDAsyncNiceSocket alloc] initWithDelegate:self delegateQueue:self.proxyDelegateQueue socketQueue:NULL];
     }
     _destinationHost = inHost;
     _destinationPort = port;
@@ -316,7 +316,7 @@
      o  X'04' - the address is a version-6 IP address, with a length of 16 octets.
      */
     NSError *error;
-    NSArray *addresses = [GCDAsyncSocket lookupHost:self.destinationHost port:self.destinationPort error:&error];
+    NSArray *addresses = [GCDAsyncNiceSocket lookupHost:self.destinationHost port:self.destinationPort error:&error];
     NSData *address = addresses.firstObject;
     
     struct sockaddr *saddr = (struct sockaddr *)address.bytes;
@@ -362,7 +362,7 @@
 #pragma mark AsyncSocket Delegate Methods
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
+- (void)socket:(GCDAsyncNiceSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
     DDLogInfo(@"proxySocket did connect to %@:%d", host, port);
 	//XMPPLogTrace();
@@ -371,7 +371,7 @@
 	[self socksOpen];
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag {
+- (void) socket:(GCDAsyncNiceSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag {
     DDLogVerbose(@"read partial data with tag %ld of length %d", tag, (int)partialLength);
     if (self.delegate && [self.delegate respondsToSelector:@selector(socket:didReadPartialDataOfLength:tag:)]) {
         dispatch_async(self.delegateQueue, ^{
@@ -382,7 +382,7 @@
     }
 }
 
-- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+- (void)socket:(GCDAsyncNiceSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     DDLogVerbose(@"did read tag[%ld] data: %@", tag, data);
 	//XMPPLogTrace();
@@ -555,10 +555,10 @@
 }
 
 
-#pragma mark GCDAsyncSocketDelegate methods
+#pragma mark GCDAsyncNiceSocketDelegate methods
 
 
-- (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag {
+- (void) socket:(GCDAsyncNiceSocket *)sock didWriteDataWithTag:(long)tag {
     if (self.delegate && [self.delegate respondsToSelector:@selector(socket:didWriteDataWithTag:)]) {
         dispatch_async(self.delegateQueue, ^{
             @autoreleasepool {
@@ -568,7 +568,7 @@
     }
 }
 
-- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err {
+- (void)socketDidDisconnect:(GCDAsyncNiceSocket *)sock withError:(NSError *)err {
     DDLogVerbose(@"proxySocket disconnected from proxy %@:%d / destination %@:%d", self.proxyHost, self.proxyPort, self.destinationHost, self.self.destinationPort);
 
     if (self.delegate && [self.delegate respondsToSelector:@selector(socketDidDisconnect:withError:)]) {
@@ -580,7 +580,7 @@
     }
 }
 
-- (void) socketDidSecure:(GCDAsyncSocket *)sock {
+- (void) socketDidSecure:(GCDAsyncNiceSocket *)sock {
     DDLogVerbose(@"didSecure proxy %@:%d / destination %@:%d", self.proxyHost, self.proxyPort, self.destinationHost, self.self.destinationPort);
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(socketDidSecure:)]) {
@@ -592,7 +592,7 @@
     }
 }
 
-- (void)socketDidCloseReadStream:(GCDAsyncSocket *)sock
+- (void)socketDidCloseReadStream:(GCDAsyncNiceSocket *)sock
 {
     if (self.delegate && [self.delegate respondsToSelector:@selector(socketDidCloseReadStream:)]) {
         dispatch_async(self.delegateQueue, ^{
@@ -603,7 +603,7 @@
     }
 }
 
-- (void)socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
+- (void)socket:(GCDAsyncNiceSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
 {
     if (self.delegate && [self.delegate respondsToSelector:@selector(socket:didWritePartialDataOfLength:tag:)]) {
         dispatch_async(self.delegateQueue, ^{
@@ -614,7 +614,7 @@
     }
 }
 
-- (void)socket:(GCDAsyncSocket *)sock didReceiveTrust:(SecTrustRef)trust completionHandler:(void (^)(BOOL))completionHandler
+- (void)socket:(GCDAsyncNiceSocket *)sock didReceiveTrust:(SecTrustRef)trust completionHandler:(void (^)(BOOL))completionHandler
 {
     if (self.delegate && [self.delegate respondsToSelector:@selector(socket:didReceiveTrust:completionHandler:)]) {
         dispatch_async(self.delegateQueue, ^{
