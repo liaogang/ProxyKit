@@ -15,8 +15,8 @@ Pod::Spec.new do |s|
   s.default_subspec = 'standard'
 
   s.subspec 'common' do |ss|
-    ss.dependency 'CocoaAsyncSocket', '~> 7.6'
-    ss.dependency 'CocoaLumberjack' # Don't pin version because of 2->3 dependency upgrade nightmare
+    ss.dependency 'CocoaAsyncNiceSocket', '~> 7.6'
+    #ss.dependency 'CocoaLumberjack' # Don't pin version because of 2->3 dependency upgrade nightmare
     ss.requires_arc = true
   end
 

@@ -11,11 +11,11 @@
 // #import <CocoaLumberjack/CocoaLumberjack.h>
 
 //@import CocoaLumberjack;
-#if DEBUG
-    static const int ddLogLevel = DDLogLevelVerbose;
-#else
-    static const int ddLogLevel = DDLogLevelOff;
-#endif
+// #if DEBUG
+//     static const int //DDLogLevel = //DDLogLevelVerbose;
+// #else
+//     static const int //DDLogLevel = //DDLogLevelOff;
+// #endif
 
 
 // Define various socket tags
@@ -92,7 +92,7 @@
 
 - (void) writeData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        ////DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket writeData:data withTimeout:timeout tag:tag];
@@ -100,63 +100,63 @@
 
 - (void)readDataWithTimeout:(NSTimeInterval)timeout buffer:(NSMutableData *)buffer bufferOffset:(NSUInteger)offset tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        ////DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataWithTimeout:timeout buffer:buffer bufferOffset:offset tag:tag];
 }
 - (void)readDataWithTimeout:(NSTimeInterval)timeout buffer:(NSMutableData *)buffer bufferOffset:(NSUInteger)offset maxLength:(NSUInteger)length tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        ////DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataWithTimeout:timeout buffer:buffer bufferOffset:offset maxLength:length tag:tag];
 }
 - (void) readDataWithTimeout:(NSTimeInterval)timeout tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        //DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataWithTimeout:timeout tag:tag];
 }
 - (void)readDataToLength:(NSUInteger)length withTimeout:(NSTimeInterval)timeout tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        //DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataToLength:length withTimeout:timeout tag:tag];
 }
 - (void)readDataToLength:(NSUInteger)length withTimeout:(NSTimeInterval)timeout buffer:(NSMutableData *)buffer bufferOffset:(NSUInteger)offset tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        //DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataToLength:length withTimeout:timeout buffer:buffer bufferOffset:offset tag:tag];
 }
 - (void)readDataToData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        //DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataToData:data withTimeout:timeout tag:tag];
 }
 - (void)readDataToData:(NSData *)data withTimeout:(NSTimeInterval)timeout buffer:(NSMutableData *)buffer bufferOffset:(NSUInteger)offset tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        //DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataToData:data withTimeout:timeout buffer:buffer bufferOffset:offset tag:tag];
 }
 - (void)readDataToData:(NSData *)data withTimeout:(NSTimeInterval)timeout maxLength:(NSUInteger)length tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        //DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataToData:data withTimeout:timeout maxLength:length tag:tag];
 }
 - (void)readDataToData:(NSData *)data withTimeout:(NSTimeInterval)timeout buffer:(NSMutableData *)buffer bufferOffset:(NSUInteger)offset maxLength:(NSUInteger)length tag:(long)tag {
     if ([self checkForReservedTag:tag]) {
-        DDLogError(@"This tag is reserved and won't work: %ld", tag);
+        //DDLogError(@"This tag is reserved and won't work: %ld", tag);
         return;
     }
     [self.proxySocket readDataToData:data withTimeout:timeout buffer:buffer bufferOffset:offset maxLength:length tag:tag];
@@ -216,7 +216,7 @@
 	byteBuffer[2] = method;
 	
 	NSData *data = [NSData dataWithBytesNoCopy:byteBuffer length:byteBufferLength freeWhenDone:YES];
-	DDLogVerbose(@"TURNSocket: SOCKS_OPEN: %@", data);
+	//DDLogVerbose(@"TURNSocket: SOCKS_OPEN: %@", data);
     
 	[self.proxySocket writeData:data withTimeout:-1 tag:SOCKS_OPEN];
 	
@@ -332,7 +332,7 @@
     offset+=portLength;
 
 	NSData *data = [NSData dataWithBytesNoCopy:byteBuffer length:byteBufferLength freeWhenDone:YES];
-	DDLogVerbose(@"TURNSocket: SOCKS_CONNECT: %@", data);
+	//DDLogVerbose(@"TURNSocket: SOCKS_CONNECT: %@", data);
 	
 	[self.proxySocket writeData:data withTimeout:-1 tag:SOCKS_CONNECT];
 	
@@ -364,7 +364,7 @@
 
 - (void)socket:(GCDAsyncNiceSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
-    DDLogInfo(@"proxySocket did connect to %@:%d", host, port);
+    //DDLogInfo(@"proxySocket did connect to %@:%d", host, port);
 	//XMPPLogTrace();
 	
 	// Start the SOCKS protocol stuff
@@ -372,7 +372,7 @@
 }
 
 - (void) socket:(GCDAsyncNiceSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag {
-    DDLogVerbose(@"read partial data with tag %ld of length %d", tag, (int)partialLength);
+    //DDLogVerbose(@"read partial data with tag %ld of length %d", tag, (int)partialLength);
     if (self.delegate && [self.delegate respondsToSelector:@selector(socket:didReadPartialDataOfLength:tag:)]) {
         dispatch_async(self.delegateQueue, ^{
             @autoreleasepool {
@@ -384,7 +384,7 @@
 
 - (void)socket:(GCDAsyncNiceSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-    DDLogVerbose(@"did read tag[%ld] data: %@", tag, data);
+    //DDLogVerbose(@"did read tag[%ld] data: %@", tag, data);
 	//XMPPLogTrace();
 	
 	if (tag == SOCKS_OPEN)
@@ -395,7 +395,7 @@
 		uint8_t version = bytes[0];
 		uint8_t method = bytes[1];
 		
-		DDLogVerbose(@"TURNSocket: SOCKS_OPEN: ver(%o) mtd(%o)", version, method);
+		//DDLogVerbose(@"TURNSocket: SOCKS_OPEN: ver(%o) mtd(%o)", version, method);
 		
 		if(version == 5)
 		{
@@ -418,13 +418,13 @@
 	{
 		// See socksConnect method for socks reply format
 		NSAssert(data.length == 5, @"SOCKS_CONNECT_REPLY_1 length must be 5!");
-		DDLogVerbose(@"TURNSocket: SOCKS_CONNECT_REPLY_1: %@", data);
+		//DDLogVerbose(@"TURNSocket: SOCKS_CONNECT_REPLY_1: %@", data);
 		uint8_t *bytes = (uint8_t*)[data bytes];
         
 		uint8_t ver = bytes[0];
 		uint8_t rep = bytes[1];
 		
-		DDLogVerbose(@"TURNSocket: SOCKS_CONNECT_REPLY_1: ver(%o) rep(%o)", ver, rep);
+		//DDLogVerbose(@"TURNSocket: SOCKS_CONNECT_REPLY_1: ver(%o) rep(%o)", ver, rep);
 		
 		if(ver == 5 && rep == 0)
 		{
@@ -448,8 +448,8 @@
 			{
 				uint8_t addrLength = bytes[4];
 				
-				DDLogVerbose(@"TURNSocket: addrLength: %o", addrLength);
-				DDLogVerbose(@"TURNSocket: portLength: %o", portLength);
+				//DDLogVerbose(@"TURNSocket: addrLength: %o", addrLength);
+				//DDLogVerbose(@"TURNSocket: portLength: %o", portLength);
 				
 				[self.proxySocket readDataToLength:(addrLength+portLength)
 								  withTimeout:TIMEOUT_READ
@@ -461,7 +461,7 @@
 				// We just have to read in that last byte
 				[self.proxySocket readDataToLength:1 withTimeout:TIMEOUT_READ tag:SOCKS_CONNECT_REPLY_2];
 			} else {
-				DDLogVerbose(@"TURNSocket: Unknown atyp field in connect reply");
+				//DDLogVerbose(@"TURNSocket: Unknown atyp field in connect reply");
 				[self.proxySocket disconnect];
 			}
 		}
@@ -497,7 +497,7 @@
                     failureReason = @"unknown socks  error";
                     break;
             }
-            DDLogVerbose(@"SOCKS failed, disconnecting: %@", failureReason);
+            //DDLogVerbose(@"SOCKS failed, disconnecting: %@", failureReason);
 			// Some kind of error occurred.
             
 			[self.proxySocket disconnect];
@@ -507,7 +507,7 @@
 	{
 		// See socksConnect method for socks reply format
 		
-		DDLogVerbose(@"TURNSocket: SOCKS_CONNECT_REPLY_2: %@", data);
+		//DDLogVerbose(@"TURNSocket: SOCKS_CONNECT_REPLY_2: %@", data);
 		
         if (self.delegate && [self.delegate respondsToSelector:@selector(socket:didConnectToHost:port:)]) {
             dispatch_async(self.delegateQueue, ^{
@@ -526,19 +526,19 @@
          0x00 = success
          any other value = failure, connection must be closed
          */
-        DDLogVerbose(@"TURNSocket: SOCKS_AUTH_USERPASS: %@", data);
+        //DDLogVerbose(@"TURNSocket: SOCKS_AUTH_USERPASS: %@", data);
         if (data.length == 2) {
             uint8_t *bytes = (uint8_t*)[data bytes];
             uint8_t status = bytes[1];
             if (status == 0x00) {
                 [self socksConnect];
             } else {
-                DDLogVerbose(@"TURNSocket: Invalid SOCKS username/password auth");
+                //DDLogVerbose(@"TURNSocket: Invalid SOCKS username/password auth");
                 [self.proxySocket disconnect];
                 return;
             }
         } else {
-            DDLogVerbose(@"TURNSocket: Invalid SOCKS username/password response length");
+            //DDLogVerbose(@"TURNSocket: Invalid SOCKS username/password response length");
             [self.proxySocket disconnect];
             return;
         }
@@ -569,7 +569,7 @@
 }
 
 - (void)socketDidDisconnect:(GCDAsyncNiceSocket *)sock withError:(NSError *)err {
-    DDLogVerbose(@"proxySocket disconnected from proxy %@:%d / destination %@:%d", self.proxyHost, self.proxyPort, self.destinationHost, self.self.destinationPort);
+    //DDLogVerbose(@"proxySocket disconnected from proxy %@:%d / destination %@:%d", self.proxyHost, self.proxyPort, self.destinationHost, self.self.destinationPort);
 
     if (self.delegate && [self.delegate respondsToSelector:@selector(socketDidDisconnect:withError:)]) {
         dispatch_async(self.delegateQueue, ^{
@@ -581,7 +581,7 @@
 }
 
 - (void) socketDidSecure:(GCDAsyncNiceSocket *)sock {
-    DDLogVerbose(@"didSecure proxy %@:%d / destination %@:%d", self.proxyHost, self.proxyPort, self.destinationHost, self.self.destinationPort);
+    //DDLogVerbose(@"didSecure proxy %@:%d / destination %@:%d", self.proxyHost, self.proxyPort, self.destinationHost, self.self.destinationPort);
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(socketDidSecure:)]) {
         dispatch_async(self.delegateQueue, ^{
